@@ -1,12 +1,13 @@
 Welcome to ASL Whitepaper Sensitivity Analysis's documentation!
 ===============================================================
 
-.. include:: usage/overview.rst
+.. include:: usage/overview
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
    
+   usage/overview
    api
 
 
