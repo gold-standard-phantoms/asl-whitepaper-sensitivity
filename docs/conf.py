@@ -20,9 +20,9 @@ sys.path.append(os.path.join(os.path.dirname(__name__), "../src"))
 
 # -- Project information -----------------------------------------------------
 
-project = "ASL DRO"
+project = "ASL Whitepaper Equation Test"
 copyright = "2020, Gold Standard Phantoms"
-author = "Tom Hampshire, Aaron Oliver-Taylor"
+author = "Aaron Oliver-Taylor"
 
 
 # -- General configuration ---------------------------------------------------
@@ -36,7 +36,7 @@ extensions = ["sphinx.ext.autodoc", "sphinx.ext.mathjax"]
 # This is useful when some external dependencies are not met at build time
 # and break the building process. You may only specify the root package of
 # the dependencies themselves and omit the sub-modules:
-autodoc_mock_imports = ["numpy", "nibabel", "jsonschema", "nilearn"]
+autodoc_mock_imports = ["numpy", "nibabel", "asldro"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -65,8 +65,8 @@ todo_include_todos = True
 
 
 def run_apidoc(_):
-    """ A hook to run on documentation building which will
-        first generate the API stubs for the Sphinx build """
+    """A hook to run on documentation building which will
+    first generate the API stubs for the Sphinx build"""
 
     sys.path.append(os.path.join(os.path.dirname(__file__)))
     current_dir = os.path.abspath(os.path.dirname(__file__))
