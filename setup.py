@@ -55,8 +55,8 @@ def get_version(rel_path) -> str:
 
 
 setup(
-    name="asl-whitepaper-sensitivity",
-    version=get_version("src/asl-whitepaper-sensitivity/__init__.py"),
+    name="asl_sens",
+    version=get_version("src/asl_sens/__init__.py"),
     author="Gold Standard Phantoms",
     author_email="aaron.oliver-taylor@goldstandardphantoms.com",
     description="Sensitivity analysis of the ASL White Paper Equation",
