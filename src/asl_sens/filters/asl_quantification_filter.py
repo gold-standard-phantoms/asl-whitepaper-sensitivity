@@ -200,7 +200,7 @@ class AslQuantificationFilter(BaseFilter):
 
         input_validator.validate(self.inputs, error_type=FilterInputValidationError)
 
-        # Check that all the input images are all the same dimensions
+        # Check that all the input images have the same first 3 dimensions (can differ in the 4th)
         input_keys = self.inputs.keys()
         keys_of_images = [
             key
@@ -208,7 +208,7 @@ class AslQuantificationFilter(BaseFilter):
             if isinstance(self.inputs[key], BaseImageContainer)
         ]
 
-        list_of_image_shapes = [self.inputs[key].shape for key in keys_of_images]
+        list_of_image_shapes = [self.inputs[key].shape[:3] for key in keys_of_images]
         if list_of_image_shapes.count(list_of_image_shapes[0]) != len(
             list_of_image_shapes
         ):
@@ -233,7 +233,8 @@ class AslQuantificationFilter(BaseFilter):
         label_efficiency: float,
         t1_arterial_blood: float,
     ) -> np.ndarray:
-        """Performs ASL quantification using the White Paper equation for continuous ASL
+        """
+        Performs ASL quantification using the White Paper equation for continuous ASL
 
         :param control: [description]
         :type control: np.ndarray

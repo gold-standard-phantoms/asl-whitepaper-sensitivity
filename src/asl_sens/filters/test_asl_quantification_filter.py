@@ -162,3 +162,44 @@ def test_asl_quantification_filter_with_mock_data():
             input_params["t1_arterial_blood"],
         ),
     )
+
+
+def test_asl_quantification_filter_with_mock_timeseries():
+    """Tests the AslQuantificationFilter with some mock timeseries data"""
+    label_image_container = NiftiImageContainer(
+        nib.Nifti2Image(0.99 * np.ones((32, 32, 32, 4)), affine=np.eye(4))
+    )
+    control_image_container = NiftiImageContainer(
+        nib.Nifti2Image(np.ones((32, 32, 32, 4)), affine=np.eye(4))
+    )
+
+    input_params = {
+        "control": control_image_container,
+        "label": label_image_container,
+        "m0": TEST_NIFTI_CON_ONES,
+        "label_type": "casl",
+        "model": "whitepaper",
+        "lambda_blood_brain": 0.9,
+        "label_duration": 1.8,
+        "post_label_delay": 1.8,
+        "label_efficiency": 0.85,
+        "t1_arterial_blood": 1.65,
+    }
+
+    asl_quantification_filter = AslQuantificationFilter()
+    asl_quantification_filter.add_inputs(input_params)
+    asl_quantification_filter.run()
+
+    numpy.testing.assert_array_equal(
+        asl_quantification_filter.outputs["perfusion_rate"],
+        AslQuantificationFilter.asl_quant_wp_casl(
+            control_image_container.image[:, :, :, 0],
+            label_image_container.image[:, :, :, 0],
+            TEST_NIFTI_CON_ONES.image,
+            input_params["lambda_blood_brain"],
+            input_params["label_duration"],
+            input_params["post_label_delay"],
+            input_params["label_efficiency"],
+            input_params["t1_arterial_blood"],
+        ),
+    )
