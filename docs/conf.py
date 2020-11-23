@@ -20,7 +20,7 @@ sys.path.append(os.path.join(os.path.dirname(__name__), "../src"))
 
 # -- Project information -----------------------------------------------------
 
-project = "ASL Whitepaper Equation Test"
+project = "ASL Whitepaper Equation Analysis"
 copyright = "2020, Gold Standard Phantoms"
 author = "Aaron Oliver-Taylor"
 
@@ -54,7 +54,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
