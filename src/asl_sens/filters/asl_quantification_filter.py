@@ -111,7 +111,7 @@ class AslQuantificationFilter(BaseFilter):
                 GkmFilter.CASL,
                 GkmFilter.PCASL,
             ]:
-                self.outputs[self.KEY_PERFUSION_RATE] = self.asl_quant_wp_casl(
+                self.outputs[self.KEY_PERFUSION_RATE].image = self.asl_quant_wp_casl(
                     control=images[self.KEY_CONTROL],
                     label=images[self.KEY_LABEL],
                     m0=images[self.KEY_M0],
@@ -121,6 +121,20 @@ class AslQuantificationFilter(BaseFilter):
                     label_efficiency=self.inputs[self.KEY_LABEL_EFFICIENCY],
                     t1_arterial_blood=self.inputs[self.KEY_T1_ARTERIAL_BLOOD],
                 )
+                self.outputs[self.KEY_PERFUSION_RATE].metadata.pop(
+                    "RepetitionTime", None
+                )
+                self.outputs[self.KEY_PERFUSION_RATE].metadata.pop("EchoTime", None)
+                self.outputs[self.KEY_PERFUSION_RATE].metadata.pop("M0", None)
+                self.outputs[self.KEY_PERFUSION_RATE].metadata.pop("FlipAngle", None)
+                self.outputs[self.KEY_PERFUSION_RATE].metadata["asl_context"] = "cbf"
+                self.outputs[self.KEY_PERFUSION_RATE].metadata["Units"] = "ml/100g/min"
+                self.outputs[self.KEY_PERFUSION_RATE].metadata["ImageType"] = [
+                    "DERIVED",
+                    "PRIMARY",
+                    "PERFUSION",
+                    "RCBF",
+                ]
 
     def _validate_inputs(self):
         """Checks the inputs meet their validation creiteria
