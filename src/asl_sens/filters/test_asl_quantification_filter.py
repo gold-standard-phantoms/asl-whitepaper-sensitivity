@@ -150,7 +150,7 @@ def test_asl_quantification_filter_with_mock_data():
     asl_quantification_filter.run()
 
     numpy.testing.assert_array_equal(
-        asl_quantification_filter.outputs["perfusion_rate"],
+        asl_quantification_filter.outputs["perfusion_rate"].image,
         AslQuantificationFilter.asl_quant_wp_casl(
             TEST_NIFTI_CON_ONES.image,
             label_image_container.image,
@@ -191,7 +191,7 @@ def test_asl_quantification_filter_with_mock_timeseries():
     asl_quantification_filter.run()
 
     numpy.testing.assert_array_equal(
-        asl_quantification_filter.outputs["perfusion_rate"],
+        asl_quantification_filter.outputs["perfusion_rate"].image,
         AslQuantificationFilter.asl_quant_wp_casl(
             control_image_container.image[:, :, :, 0],
             label_image_container.image[:, :, :, 0],
