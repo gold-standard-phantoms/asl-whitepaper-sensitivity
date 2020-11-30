@@ -276,6 +276,7 @@ class AslQuantificationFilter(BaseFilter):
             * np.exp(post_label_delay / t1_arterial_blood),
             2
             * label_efficiency
+            * t1_arterial_blood
             * m0
             * (1 - np.exp(-label_duration / t1_arterial_blood)),
             out=np.zeros_like(m0),

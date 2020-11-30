@@ -73,7 +73,12 @@ class LoadAslBidsFilter(BaseFilter):
         KEY_LABEL: "label",
         KEY_M0: "m0scan",
     }
-    LIST_FIELDS_TO_EXCLUDE = ["ScanningSequence", "ComplexImageComponent", "ImageType"]
+    LIST_FIELDS_TO_EXCLUDE = [
+        "ScanningSequence",
+        "ComplexImageComponent",
+        "ImageType",
+        "AcquisitionVoxelSize",
+    ]
 
     def __init__(self):
         super().__init__(name="Load ASL BIDS")

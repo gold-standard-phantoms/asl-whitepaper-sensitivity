@@ -100,18 +100,18 @@ def test_asl_quantification_filter_asl_quant_wp_casl():
     post_label_delay = 1.8
     label_efficiency = 0.85
     t1_arterial_blood = 1.65
-
+    calc_cbf = AslQuantificationFilter.asl_quant_wp_casl(
+        control,
+        label,
+        m0,
+        lambda_blood_brain,
+        label_duration,
+        post_label_delay,
+        label_efficiency,
+        t1_arterial_blood,
+    )
     numpy.testing.assert_array_equal(
-        AslQuantificationFilter.asl_quant_wp_casl(
-            control,
-            label,
-            m0,
-            lambda_blood_brain,
-            label_duration,
-            post_label_delay,
-            label_efficiency,
-            t1_arterial_blood,
-        ),
+        calc_cbf,
         np.divide(
             6000
             * lambda_blood_brain
@@ -119,6 +119,7 @@ def test_asl_quantification_filter_asl_quant_wp_casl():
             * np.exp(post_label_delay / t1_arterial_blood),
             2
             * label_efficiency
+            * t1_arterial_blood
             * m0
             * (1 - np.exp(-label_duration / t1_arterial_blood)),
             out=np.zeros_like(m0),
