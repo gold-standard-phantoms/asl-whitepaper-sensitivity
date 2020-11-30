@@ -38,6 +38,7 @@ ARRAY_PARAMS = [
     TRANSL_Z,
 ]
 GROUND_TRUTH_OVERRIDE_PARAMS = [LAMBDA_BLOOD_BRAIN, T1_ARTERIAL_BLOOD]
+GROUND_TRUTH_MODULATE_PARAMS = ["perfusion_rate", "transit_time", "t1"]
 DEFAULT_M0_TE = 0.01
 DEFAULT_M0_TR = 10.0
 DEFAULT_CL_TE = 0.01
@@ -63,6 +64,16 @@ def whitepaper_model(asldro_params: dict, quant_params: dict) -> dict:
         if asldro_params.get(param) is not None:
             parameter_override[param] = asldro_params.pop(param)
 
+    ground_truth_modulate = {}
+    for param in GROUND_TRUTH_MODULATE_PARAMS:
+        if asldro_params.get(param) is not None:
+            ground_truth_modulate[param] = asldro_params.pop(param)
+
+    if asldro_params.get("ground_truth") is not None:
+        ground_truth = asldro_params["ground_truth"]
+    else:
+        ground_truth = "hrgt_icbm_2009a_nls_3t"
+
     # construct the DRO input parameters
     input_params = validate_input_params(
         {
@@ -70,6 +81,7 @@ def whitepaper_model(asldro_params: dict, quant_params: dict) -> dict:
                 "ground_truth": "hrgt_icbm_2009a_nls_3t",
                 "image_override": {},
                 "parameter_override": parameter_override,
+                "ground_truth_modulate": ground_truth_modulate,
             },
             "image_series": [
                 {
@@ -110,7 +122,6 @@ def whitepaper_model(asldro_params: dict, quant_params: dict) -> dict:
     input_params["image_series"][0]["series_parameters"] = asl_series_params
     ground_truth_series_params = input_params["image_series"][1]["series_parameters"]
     ground_truth_series_params[ACQ_MATRIX] = asl_series_params[ACQ_MATRIX]
-    # assert 0
 
     # run the DRO, load in the results, calculate the CBF, analyse.
     with TemporaryDirectory() as temp_dir:
