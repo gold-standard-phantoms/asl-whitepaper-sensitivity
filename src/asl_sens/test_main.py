@@ -5,6 +5,10 @@ from asl_sens.main import whitepaper_model
 
 
 def test_whitepaper_model():
+    """Tests the whitepaper 'measurement' model - generation
+    of ASL data using the DRO, then quantification using the
+    white paper equation"""
+
     asldro_params = {
         "lambda_blood_brain": 0.9,
         "t1_arterial_blood": 1.65,

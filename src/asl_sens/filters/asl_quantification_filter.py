@@ -57,7 +57,8 @@ class AslQuantificationFilter(BaseFilter):
     :param 'perfusion_rate':
     :type 'perfusion_rate': BaseImageContainer
 
-    The following equations are used to calculate the perfusion rate, depending on the input ``model``
+    The following equations are used to calculate the perfusion rate, depending on the
+    input ``model``
 
     If ``model`` is equal to 'whitepaper'
 

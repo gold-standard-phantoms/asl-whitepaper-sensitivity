@@ -6,7 +6,6 @@ import json
 from tempfile import TemporaryDirectory
 
 import numpy as np
-import nibabel as nib
 
 from asldro.examples import run_full_pipeline
 from asldro.filters.nifti_loader import NiftiLoaderFilter
@@ -46,7 +45,17 @@ DEFAULT_CL_TR = 5.0
 
 
 def whitepaper_model(asldro_params: dict, quant_params: dict) -> dict:
+    """Function that generates synthetic ASL data using ASLDRO, then loads in the data
+    and the  AslQuantificationFilter to calculate the perfusion rate.  Then, the resampled
+    ground truth label map is used to calculate region statistics for the defined tissues.
 
+    :param asldro_params: [description]
+    :type asldro_params: dict
+    :param quant_params: [description]
+    :type quant_params: dict
+    :return: [description]
+    :rtype: dict
+    """
     # check the inputs are valid
     # pop the values associated with the ground truth
     parameter_override = {}
