@@ -1,6 +1,7 @@
 """tests for main.py"""
 import pytest
 
+
 from asl_sens.main import whitepaper_model
 
 
@@ -18,6 +19,10 @@ def test_whitepaper_model():
         "acq_matrix": [64, 64, 20],
         "label_duration": 1.8,
         "signal_time": 3.6,
+        "perfusion_rate": {
+            "scale": 1.0,
+        },
+        "ground_truth": "hrgt_icbm_2009a_nls_3t",
     }
 
     quant_params = {
