@@ -1,23 +1,19 @@
 """Load ASL BIDS filter class"""
 
 import os
-from logging import Filter
+import json
+
 import numpy as np
 import nibabel as nib
-import json
+
 from asldro.filters.basefilter import BaseFilter, FilterInputValidationError
-from asldro.filters.gkm_filter import GkmFilter
-from asldro.containers.image import BaseImageContainer, NiftiImageContainer
+from asldro.containers.image import NiftiImageContainer
 from asldro.validators.parameters import (
     Parameter,
     ParameterValidator,
     isinstance_validator,
-    greater_than_equal_to_validator,
-    from_list_validator,
-    range_inclusive_validator,
 )
 from asldro.validators.user_parameter_input import SUPPORTED_ASL_CONTEXTS
-from asldro.filters.bids_output_filter import BidsOutputFilter
 
 
 class LoadAslBidsFilter(BaseFilter):
@@ -40,8 +36,8 @@ class LoadAslBidsFilter(BaseFilter):
     :param 'sidecar_filename': path and filename to the json sidecar (must end in .json)
     :type 'image_filename': str
     :param 'aslcontext_filename': path and filename to the aslcontext file (must end in .tsv).  This
-    must be a tab separated values file, with heading 'volume_type' and then entries which are either
-    'control', 'label', or 'm0scan'.
+        must be a tab separated values file, with heading 'volume_type' and then entries which are
+        either 'control', 'label', or 'm0scan'.
     :type 'aslcontext_filename': str
 
     **Outputs**
@@ -73,7 +69,12 @@ class LoadAslBidsFilter(BaseFilter):
         KEY_LABEL: "label",
         KEY_M0: "m0scan",
     }
-    LIST_FIELDS_TO_EXCLUDE = ["ScanningSequence", "ComplexImageComponent", "ImageType"]
+    LIST_FIELDS_TO_EXCLUDE = [
+        "ScanningSequence",
+        "ComplexImageComponent",
+        "ImageType",
+        "AcquisitionVoxelSize",
+    ]
 
     def __init__(self):
         super().__init__(name="Load ASL BIDS")

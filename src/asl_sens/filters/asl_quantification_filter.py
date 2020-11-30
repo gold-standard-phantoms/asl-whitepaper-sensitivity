@@ -57,7 +57,8 @@ class AslQuantificationFilter(BaseFilter):
     :param 'perfusion_rate':
     :type 'perfusion_rate': BaseImageContainer
 
-    The following equations are used to calculate the perfusion rate, depending on the input ``model``
+    The following equations are used to calculate the perfusion rate, depending on the
+    input ``model``
 
     If ``model`` is equal to 'whitepaper'
 
@@ -276,6 +277,7 @@ class AslQuantificationFilter(BaseFilter):
             * np.exp(post_label_delay / t1_arterial_blood),
             2
             * label_efficiency
+            * t1_arterial_blood
             * m0
             * (1 - np.exp(-label_duration / t1_arterial_blood)),
             out=np.zeros_like(m0),

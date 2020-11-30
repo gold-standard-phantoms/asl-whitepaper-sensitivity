@@ -7,9 +7,10 @@ import numpy as np
 import numpy.testing
 import nibabel as nib
 
-from asl_sens.filters.asl_quantification_filter import AslQuantificationFilter
 from asldro.filters.basefilter import BaseFilter, FilterInputValidationError
 from asldro.containers.image import NiftiImageContainer
+
+from asl_sens.filters.asl_quantification_filter import AslQuantificationFilter
 
 TEST_VOLUME_DIMENSIONS = (32, 32, 32)
 TEST_NIFTI_ONES = nib.Nifti2Image(
@@ -43,15 +44,15 @@ INPUT_VALIDATION_DICT = {
 }
 
 
-def validate_filter_inputs(filter: BaseFilter, validation_data: dict):
+def validate_filter_inputs(flt: BaseFilter, validation_data: dict):
     """Tests a filter with a validation data dictionary.  Checks that FilterInputValidationErrors
     are raised when data is missing or incorrect.
-    :param filter: [description]
-    :type filter: BaseFilter
+    :param flt: [description]
+    :type flt: BaseFilter
     :param validation_data: [description]
     :type validation_data: dict
     """
-    test_filter = filter()
+    test_filter = flt()
     test_data = deepcopy(validation_data)
     # check with inputs that should pass
     for data_key in test_data:
@@ -59,7 +60,7 @@ def validate_filter_inputs(filter: BaseFilter, validation_data: dict):
 
     for inputs_key in validation_data:
         test_data = deepcopy(validation_data)
-        test_filter = filter()
+        test_filter = flt()
         is_optional: bool = test_data[inputs_key][0]
 
         # remove key
@@ -76,7 +77,7 @@ def validate_filter_inputs(filter: BaseFilter, validation_data: dict):
 
         # Try data that should fail
         for test_value in validation_data[inputs_key][2:]:
-            test_filter = filter()
+            test_filter = flt()
             for data_key in test_data:
                 test_filter.add_input(data_key, test_data[data_key][1])
             test_filter.add_input(inputs_key, test_value)
@@ -92,6 +93,8 @@ def test_asl_quantification_filter_validate_inputs():
 
 
 def test_asl_quantification_filter_asl_quant_wp_casl():
+    """Test that the static function asl_quant_wp_casl produces correct results"""
+
     control = np.ones(TEST_VOLUME_DIMENSIONS)
     label = (1 - 0.001) * np.ones(TEST_VOLUME_DIMENSIONS)
     m0 = np.ones(TEST_VOLUME_DIMENSIONS)
@@ -100,18 +103,18 @@ def test_asl_quantification_filter_asl_quant_wp_casl():
     post_label_delay = 1.8
     label_efficiency = 0.85
     t1_arterial_blood = 1.65
-
+    calc_cbf = AslQuantificationFilter.asl_quant_wp_casl(
+        control,
+        label,
+        m0,
+        lambda_blood_brain,
+        label_duration,
+        post_label_delay,
+        label_efficiency,
+        t1_arterial_blood,
+    )
     numpy.testing.assert_array_equal(
-        AslQuantificationFilter.asl_quant_wp_casl(
-            control,
-            label,
-            m0,
-            lambda_blood_brain,
-            label_duration,
-            post_label_delay,
-            label_efficiency,
-            t1_arterial_blood,
-        ),
+        calc_cbf,
         np.divide(
             6000
             * lambda_blood_brain
@@ -119,6 +122,7 @@ def test_asl_quantification_filter_asl_quant_wp_casl():
             * np.exp(post_label_delay / t1_arterial_blood),
             2
             * label_efficiency
+            * t1_arterial_blood
             * m0
             * (1 - np.exp(-label_duration / t1_arterial_blood)),
             out=np.zeros_like(m0),
