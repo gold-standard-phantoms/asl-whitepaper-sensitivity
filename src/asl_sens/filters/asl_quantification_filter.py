@@ -21,7 +21,7 @@ class AslQuantificationFilter(BaseFilter):
 
     **Inputs**
 
-    Input Parameters are all keyword arguments for the :class:`AslQuantificationFilter.add_inputs()`
+    Input Parameters are all keyword arguments for the :class:`AslQuantificationFilter.add_input()`
     member function. They are also accessible via class constants, for example
     :class:`AslQuantificationFilter.KEY_CONTROL`
 
@@ -138,7 +138,7 @@ class AslQuantificationFilter(BaseFilter):
                 ]
 
     def _validate_inputs(self):
-        """Checks the inputs meet their validation creiteria
+        """Checks the inputs meet their validation criteria
         'control' must be derived from BaseImageContainer
         'label' must be derived from BaseImageContainer
         'm0' must be derived from BaseImageContainer
