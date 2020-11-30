@@ -57,6 +57,7 @@ def validate_filter_inputs(flt: BaseFilter, validation_data: dict):
     # check with inputs that should pass
     for data_key in test_data:
         test_filter.add_input(data_key, test_data[data_key][1])
+    test_filter.run()
 
     for inputs_key in validation_data:
         test_data = deepcopy(validation_data)
