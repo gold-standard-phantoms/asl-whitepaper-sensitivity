@@ -1,9 +1,13 @@
 """ASL Whitepaper Sensitivity Analysis"""
 
+import sys
 import os
 import shutil
 import json
 from tempfile import TemporaryDirectory
+from copy import deepcopy
+import argparse
+import pdb
 
 import numpy as np
 
@@ -23,9 +27,11 @@ from asldro.validators.user_parameter_input import (
     ECHO_TIME,
     REPETITION_TIME,
 )
+from asldro.cli import FileType
 
 from asl_sens.filters.load_asl_bids_filter import LoadAslBidsFilter
 from asl_sens.filters.asl_quantification_filter import AslQuantificationFilter
+from asl_sens.filters.roi_statistics_filter import RoiStatisticsFilter
 
 ARRAY_PARAMS = [
     ECHO_TIME,
@@ -45,18 +51,100 @@ DEFAULT_CL_TE = 0.01
 DEFAULT_CL_TR = 5.0
 
 
-def whitepaper_model(asldro_params: dict, quant_params: dict) -> dict:
+def main():
+    """Main function for the command line interface."""
+    parser = argparse.ArgumentParser(
+        description="""ASL Whitepaper sensitivity analys using the
+        ASLDRO digital reference object to generate synthetic ASL data with which
+        the perfusion rate is calculated using the ASL Whitepaper
+        single-subtraction equation""",
+    )
+    parser.add_argument(
+        "output",
+        help="path and filename to save output to",
+        type=FileType(extensions=["csv"]),
+    )
+    args = parser.parse_args()
+    output_filename = args.output
+
+    ## Vary perfusion_rate scaling
+    num_prs = 21
+    perfusion_rate_scale = np.linspace(0, 2, num_prs)
+
+    # pre-allocate output array:
+    # mean and SD for GM and WM, calculated and ground truth
+    output_array = np.zeros((num_prs, 10))
+
+    asldro_params = {
+        "lambda_blood_brain": 0.9,
+        "t1_arterial_blood": 1.65,
+        "label_efficiency": 0.85,
+        "asl_context": "m0scan control label control label control label control label",
+        "desired_snr": 1e10,
+        "acq_matrix": [197, 233, 189],
+        "label_duration": 1.8,
+        "signal_time": 3.6,
+        "perfusion_rate": {
+            "scale": 1.0,
+        },
+        "ground_truth": "hrgt_icbm_2009a_nls_3t",
+    }
+
+    quant_params = {
+        "label_type": "pcasl",
+        "model": "whitepaper",
+        "label_duration": 1.8,
+        "post_label_delay": asldro_params["signal_time"]
+        - asldro_params["label_duration"],
+        "label_efficiency": 0.85,
+        "lambda_blood_brain": 0.9,
+        "t1_arterial_blood": 1.65,
+    }
+
+    results = []
+    # loop over the perfusion rate
+    for idx, prs in enumerate(perfusion_rate_scale):
+        asldro_params["perfusion_rate"]["scale"] = prs
+        results.append(whitepaper_model(asldro_params, quant_params))
+        output_array[idx, 0] = prs * 60.0
+        output_array[idx, 1] = prs * 20.0
+        output_array[idx, 2] = results[idx]["calculated"]["GM"]["mean"]
+        output_array[idx, 3] = results[idx]["calculated"]["GM"]["sd"]
+        output_array[idx, 4] = results[idx]["calculated"]["WM"]["mean"]
+        output_array[idx, 5] = results[idx]["calculated"]["WM"]["sd"]
+        output_array[idx, 6] = results[idx]["ground_truth"]["GM"]["mean"]
+        output_array[idx, 7] = results[idx]["ground_truth"]["GM"]["sd"]
+        output_array[idx, 8] = results[idx]["ground_truth"]["WM"]["mean"]
+        output_array[idx, 9] = results[idx]["ground_truth"]["WM"]["sd"]
+
+    np.savetxt(
+        output_filename,
+        X=output_array,
+        fmt="%.8f",
+        delimiter=", ",
+        header="input GM, input WM, calc GM mean,calc GM sd,calc WM mean,calc WM sd,gt GM mean,gt GM sd,gt WM mean,gt WM sd",
+    )
+
+
+def whitepaper_model(dro_params: dict, calc_params: dict) -> dict:
     """Function that generates synthetic ASL data using ASLDRO, then loads in the data
     and the  AslQuantificationFilter to calculate the perfusion rate.  Then, the resampled
     ground truth label map is used to calculate region statistics for the defined tissues.
 
-    :param asldro_params: [description]
-    :type asldro_params: dict
-    :param quant_params: [description]
-    :type quant_params: dict
-    :return: [description]
+    :param dro_params: Dictionary of DRO parameters - ground truth override and scaling parameters
+        are removed and then this dictionary is merged with the ASL and ground truth image series
+        parameters.
+    :type dro_params: dict
+    :param calc_params: Dictionary of parameters for the quantification model.
+    :type calc_params: dict
+    :return: dictionary containing ROI statistics for both calculated perfusion rate and the
+        ground truth after resampling to the ASL acquisition resolution.
     :rtype: dict
     """
+    # copy input dictionaries as they are modified
+    asldro_params = dro_params.copy()
+    quant_params = calc_params.copy()
+
     # check the inputs are valid
     # pop the values associated with the ground truth
     parameter_override = {}
@@ -78,7 +166,7 @@ def whitepaper_model(asldro_params: dict, quant_params: dict) -> dict:
     input_params = validate_input_params(
         {
             "global_configuration": {
-                "ground_truth": "hrgt_icbm_2009a_nls_3t",
+                "ground_truth": ground_truth,
                 "image_override": {},
                 "parameter_override": parameter_override,
                 "ground_truth_modulate": ground_truth_modulate,
@@ -161,7 +249,6 @@ def whitepaper_model(asldro_params: dict, quant_params: dict) -> dict:
         asl_quantification_filter.add_inputs(quant_params)
 
         asl_quantification_filter.run()
-        calc_cbf = asl_quantification_filter.outputs["perfusion_rate"]
 
         # load in the ground truth segmentation
         seg_nifti_loader = NiftiLoaderFilter()
@@ -175,42 +262,29 @@ def whitepaper_model(asldro_params: dict, quant_params: dict) -> dict:
         # load in the ground truth perfusion rate
         perf_nifti_loader = NiftiLoaderFilter()
         perf_nifti_loader.add_input("filename", gt_perf_fn)
-        perf_nifti_loader.run()
 
-        label_map_data = seg_nifti_loader.outputs["image"].image
-        label_regions = seg_nifti_loader.outputs["image"].metadata["LabelMap"]
+        calc_roi_stats_filter = RoiStatisticsFilter()
+        calc_roi_stats_filter.add_parent_filter(
+            asl_quantification_filter, io_map={"perfusion_rate": "image"}
+        )
+        calc_roi_stats_filter.add_input("label_map", seg_nifti_loader.outputs["image"])
+        calc_roi_stats_filter.run()
 
-        gt_cbf = perf_nifti_loader.outputs["image"].image
+        gt_roi_stats_filter = RoiStatisticsFilter()
+        gt_roi_stats_filter.add_parent_filter(perf_nifti_loader)
+        gt_roi_stats_filter.add_input("label_map", seg_nifti_loader.outputs["image"])
+        gt_roi_stats_filter.run()
 
         output_dictionary = {}
-        output_dictionary["calculated"] = {
-            region: {
-                "id": label_regions[region],
-                "mean": np.mean(
-                    calc_cbf.image[(label_map_data == label_regions[region])]
-                ),
-                "sd": np.std(calc_cbf.image[label_map_data == label_regions[region]]),
-                "size": np.size(
-                    calc_cbf.image[label_map_data == label_regions[region]]
-                ),
-            }
-            for region in label_regions.keys()
-        }
+        output_dictionary["calculated"] = calc_roi_stats_filter.outputs[
+            RoiStatisticsFilter.KEY_REGION_STATS
+        ]
 
-        output_dictionary["ground_truth"] = {
-            region: {
-                "id": label_regions[region],
-                "mean": np.mean(gt_cbf[(label_map_data == label_regions[region])]),
-                "sd": np.std(gt_cbf[label_map_data == label_regions[region]]),
-                "size": np.size(gt_cbf[label_map_data == label_regions[region]]),
-            }
-            for region in label_regions.keys()
-        }
-
-        # shutil.move(asl_fn[LoadAslBidsFilter.KEY_IMAGE_FILENAME], output_directory)
-        # shutil.move(gt_seg_fn, output_directory)
-        # shutil.move(gt_perf_fn, output_directory)
-        # nib.save(
-        #    calc_cbf.nifti_image, os.path.join(output_directory, "calc_cbf.nii.gz")
-        # )
+        output_dictionary["ground_truth"] = gt_roi_stats_filter.outputs[
+            RoiStatisticsFilter.KEY_REGION_STATS
+        ]
         return output_dictionary
+
+
+if __name__ == "__main__":
+    main()
