@@ -12,6 +12,7 @@ from copy import deepcopy
 import argparse
 import pdb
 
+import pandas as pd
 import numpy as np
 from numpy.random import default_rng
 
@@ -210,6 +211,8 @@ def main():
     # mean and SD for GM and WM, calculated and ground truth
     output_array = np.zeros((num_samples, 8))
 
+    results_df = pd.DataFrame(model_parameters, dtype=float)
+
     results = []
     for idx in range(num_samples):
 
@@ -237,25 +240,35 @@ def main():
 
     # combined arrays
 
-    np.savetxt(
-        output_filename,
-        X=np.concatenate(
-            (
-                model_parameters["perfusion_rate_scale"][:, np.newaxis],
-                model_parameters["transit_time_scale"][:, np.newaxis],
-                model_parameters["t1_tissue_scale"][:, np.newaxis],
-                model_parameters["lambda_blood_brain"][:, np.newaxis],
-                model_parameters["t1_arterial_blood"][:, np.newaxis],
-                model_parameters["label_efficiency"][:, np.newaxis],
-                model_parameters["desired_snr"][:, np.newaxis],
-                output_array,
-            ),
-            axis=1,
-        ),
-        fmt="%.8f",
-        delimiter=", ",
-        header="perfusion rate scale, transit time scale, t1 tissue scale, lambda blood brain, t1 arterial blood, label efficiency, desired snr, calc GM mean,calc GM sd,calc WM mean,calc WM sd, gt GM mean,gt GM sd,gt WM mean,gt WM sd",
+    # Create a pandas DataFrame to hold the results
+
+    output_df = pd.DataFrame(
+        output_array,
+        columns=[
+            "calc GM mean",
+            "calc GM sd",
+            "calc WM mean",
+            "calc WM sd",
+            "gt GM mean",
+            "gt GM sd",
+            "gt WM mean",
+            "gt WM sd",
+        ],
     )
+    results_df = pd.concat([results_df, output_df], axis=1)
+    results_df.to_csv(output_filename, float_format="%.8f")
+
+    # if a sensitivity analysis is run, analyse these results
+    if input_params["analysis_type"] == SENSITIVITY:
+        sens_analysis_results = analyse_effects(results_df)
+        for key in sens_analysis_results:
+            with open(output_filename, mode="a") as csv_file:
+                csv_file.write("\n\n" + key + "\n")
+
+            sens_analysis_results[key].to_csv(
+                output_filename, float_format="%0.8f", mode="a"
+            )
+
     print("--- %.2f seconds ---" % (time.clock() - start_time))
 
 
@@ -455,6 +468,83 @@ def get_random_variable(random_spec: dict, size=None, rng=None) -> np.ndarray:
         return np.array(out, ndmin=1)
     else:
         return out
+
+
+def analyse_effects(results_df: pd.DataFrame) -> dict:
+    """Analyses the main effect and two-way interactions from a 2-level
+    sensitivity analysis
+
+    Args:
+        results_df (pd.DataFrame): the output from the sensitivity analysis
+
+    Returns:
+        dict: analysed results, with an interaction matrix for each output
+        parameter.
+    """
+
+    # get the labels of the parameters: omit first column, last 8 are the results values
+    all_parameter_labels = list(results_df.columns.values[0:-8])
+    results_labels = list(results_df.columns.values[-8:-4])
+
+    # determine which parameters are varying and so should be analysed
+    sens_params = [
+        param
+        for param in all_parameter_labels
+        if not all(results_df[param].values == results_df[param].values[0])
+    ]
+    encoded_levels = results_df[sens_params]
+    for param in sens_params:
+        values: np.array = results_df[param].values
+        valmax = values.max()
+        valmin = values.min()
+        valavg = (valmax + valmin) / 2
+        span = (valmax - valmin) / 2
+        encoded_levels.loc[:, param] = encoded_levels.loc[:, param].map(
+            lambda x: (x - valavg) / span
+        )
+
+    # main effects
+    output = {}
+    for result in results_labels:
+        interactions_matrix = pd.DataFrame(
+            index=sens_params,
+            columns=sens_params,
+        )
+        for param in sens_params:
+            effects = results_df.groupby(param)[result].mean()
+            levels = encoded_levels.groupby(param).mean()
+            interactions_matrix.at[param, param] = sum(
+                [
+                    level * effects.values[i]
+                    for i, level in enumerate(levels.index.values)
+                ]
+            )
+            # calculate the standard error for comparing the effects against
+            interactions_matrix.at["std_err", param] = results_df[result].std(
+                ddof=0
+            ) / np.sqrt(2 ** len(results_df[result]))
+        output[result] = {}
+        output[result] = interactions_matrix
+
+    # two-way effects
+    if len(sens_params) > 1:
+        twoway_labels = list(itertools.combinations(sens_params, 2))
+        for result in results_labels:
+            for key in twoway_labels:
+                keylist = list(key)
+                effects = results_df.groupby(keylist)[result].mean()
+                levels_i = encoded_levels.groupby(key[0]).mean()
+                levels_j = encoded_levels.groupby(key[1]).mean()
+                vals_i: np.ndarray = results_df[key[0]].unique()
+                vals_j: np.ndarray = results_df[key[1]].unique()
+                output[result].at[key[0], key[1]] = sum(
+                    [
+                        lev_i * lev_j * effects[vals_i[i]][vals_j[j]] / 2
+                        for i, lev_i in enumerate(levels_i.index.values)
+                        for j, lev_j in enumerate(levels_j.index.values)
+                    ]
+                )
+    return output
 
 
 if __name__ == "__main__":
