@@ -1,11 +1,13 @@
 """tests for main.py"""
 import pytest
+
+import pandas as pd
 import numpy as np
 import numpy.testing
 from numpy.random import default_rng
 
-
-from asl_sens.main import get_random_variable, whitepaper_model
+from asl_sens.data.filepaths import SENS_ANALYSIS_TEST_DATA
+from asl_sens.main import analyse_effects, get_random_variable, whitepaper_model
 
 
 def test_whitepaper_model():
@@ -87,3 +89,36 @@ def test_random_variable():
     x = np.linspace(10, 11, 200)
     y = get_random_variable(random_spec, 200)
     numpy.testing.assert_equal(x, y)
+
+
+def test_analyse_effects():
+    """Tests the analyse_effects function with a toy example with the results
+    form a two-parameter sensitivity analysis."""
+
+    # load in example results for two parameters:
+    # label_efficiency: 0.8 and 0.9
+    # t1_arterial_blood: 1.55 and 1.75
+    results_df = pd.read_csv(SENS_ANALYSIS_TEST_DATA)
+    results_df.pop("Unnamed: 0")
+    
+    effects = analyse_effects(results_df)
+    # main effect label_efficiency for GM
+    gm_values = results_df["calc GM mean"].values
+    main_effect_label_efficiency = (np.sum(gm_values[2:4]) - np.sum(gm_values[:2])) / 2
+    main_effect_t1_arterial_blood = (
+        np.sum(gm_values[1::2]) - np.sum(gm_values[0::2])
+    ) / 2
+    numpy.testing.assert_almost_equal(
+        effects["calc GM mean"].at["label_efficiency", "label_efficiency"],
+        main_effect_label_efficiency,
+    )
+    numpy.testing.assert_almost_equal(
+        effects["calc GM mean"].at["t1_arterial_blood", "t1_arterial_blood"],
+        main_effect_t1_arterial_blood,
+    )
+    # there is only one two-way effect
+    two_way_effect = (np.sum(gm_values[::3]) - np.sum(gm_values[1:3:1])) / 2
+    numpy.testing.assert_almost_equal(
+        effects["calc GM mean"].at["label_efficiency", "t1_arterial_blood"],
+        two_way_effect,
+    )
