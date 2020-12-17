@@ -18,7 +18,7 @@
             "min": 0.8,
             "max": 1.0
         },
-        "default_snr": {
+        "desired_snr": {
             "distribution": "gaussian",
             "mean": 1e10,
             "sd": 0.0
