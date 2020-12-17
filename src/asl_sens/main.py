@@ -1,6 +1,7 @@
 """ASL Whitepaper Sensitivity Analysis"""
 
-from logging import error
+import logging
+import pprint
 import sys
 import itertools
 import os
@@ -65,21 +66,20 @@ DEFAULT_M0_TR = 10.0
 DEFAULT_CL_TE = 0.01
 DEFAULT_CL_TR = 5.0
 
+logger = logging.getLogger(__name__)
+
 
 def main():
     """Main function for the command line interface.
-    Runs either an uncertainty or sensitivity analysis.
-    For uncertainty, all the input parameters are sampled at
-    random based on their input distributions.
-    For sensitivity, a full-factorial combination of all
-    the prescribed parameters is created.
 
-    The model is then run for each set of parameters.  This
-    comprises of creating ASL data using the ASLDRO, loading the
-    BIDS output files in and then calculating CBF according to the Whitepaper
-    single subtraction equation.
+    Handles the command line interface
+    Has two positional arguments:
+
+    1. filename to save output to
+    2. input parameter file
+
+    Then runs run_analysis
     """
-    start_time = time.clock()
     parser = argparse.ArgumentParser(
         description="""ASL Whitepaper sensitivity analysis using the
         ASLDRO digital reference object to generate synthetic ASL data with which
@@ -106,6 +106,28 @@ def main():
         with open(args.params) as json_file:
             input_params = json.load(json_file)
 
+    run_analysis(input_params, output_filename)
+
+
+def run_analysis(input_params: dict, output_filename):
+    """Runs either an uncertainty or sensitivity analysis.
+    For uncertainty, all the input parameters are sampled at
+    random based on their input distributions.
+    For sensitivity, a full-factorial combination of all
+    the prescribed parameters is created.
+
+    The model is then run for each set of parameters.  This
+    comprises of creating ASL data using the ASLDRO, loading the
+    BIDS output files in and then calculating CBF according to the Whitepaper
+    single subtraction equation.
+
+    :param input_params: dictionary of input parameters
+    :type input_params: dict
+    :param output_filename: path to file to save file as, must be a csv file
+    :type output_filename: str or path
+
+    """
+    start_time = time.time()
     input_params = validate_input_parameters(input_params)
 
     asldro_params = {
@@ -152,36 +174,63 @@ def main():
         # create the randomly sampled variables using the random number generator.  All values are
         # pre-allocated which ensures that the results can be
         rng = default_rng(seed=input_params["random_seed"])
-        model_parameters["perfusion_rate_scale"] = get_random_variable(
-            input_params["parameters"][PERFUSION_RATE_SCALE], num_samples, rng
-        )
-        model_parameters["transit_time_scale"] = get_random_variable(
-            input_params["parameters"][TRANSIT_TIME_SCALE], num_samples, rng
-        )
-        model_parameters["t1_tissue_scale"] = get_random_variable(
-            input_params["parameters"][T1_TISSUE_SCALE], num_samples, rng
-        )
-        model_parameters["lambda_blood_brain"] = get_random_variable(
-            input_params["parameters"][LAMBDA_BLOOD_BRAIN], num_samples, rng
-        )
-        # ASLDRO has limits on allowable values for lambda_blood_brain
-        lambda_blood_brain = model_parameters["lambda_blood_brain"]
-        lambda_blood_brain[lambda_blood_brain > 1] = 1.0
-        lambda_blood_brain[lambda_blood_brain < 0] = 0.0
 
-        model_parameters["t1_arterial_blood"] = get_random_variable(
-            input_params["parameters"][T1_ARTERIAL_BLOOD], num_samples, rng
+        # limit `perfusion_rate_scale` so it cannot be less than 0
+        model_parameters["perfusion_rate_scale"] = np.clip(
+            get_random_variable(
+                input_params["parameters"][PERFUSION_RATE_SCALE], num_samples, rng
+            ),
+            0,
+            None,
         )
-        model_parameters["label_efficiency"] = get_random_variable(
-            input_params["parameters"][LABEL_EFFICIENCY], num_samples, rng
+        # limit `transit_time_scale` so it cannot be less than 0
+        model_parameters["transit_time_scale"] = np.clip(
+            get_random_variable(
+                input_params["parameters"][TRANSIT_TIME_SCALE], num_samples, rng
+            ),
+            0,
+            None,
         )
-        # ASLDRO has limits on allowable values for label_efficiency
-        label_efficiency = model_parameters["label_efficiency"]
-        label_efficiency[label_efficiency > 1] = 1.0
-        label_efficiency[label_efficiency < 0] = 0.0
+        # limit `t1_tissue_scale` so it cannot be less than 0
+        model_parameters["t1_tissue_scale"] = np.clip(
+            get_random_variable(
+                input_params["parameters"][T1_TISSUE_SCALE], num_samples, rng
+            ),
+            0,
+            None,
+        )
+        # ASLDRO has limits on allowable values for `lambda_blood_brain` between 0 and 1
+        model_parameters["lambda_blood_brain"] = np.clip(
+            get_random_variable(
+                input_params["parameters"][LAMBDA_BLOOD_BRAIN], num_samples, rng
+            ),
+            0,
+            1,
+        )
 
-        model_parameters["desired_snr"] = get_random_variable(
-            input_params["parameters"][DESIRED_SNR], num_samples, rng
+        # limit `t1_arterial_blood` so it cannot be less than 0
+        model_parameters["t1_arterial_blood"] = np.clip(
+            get_random_variable(
+                input_params["parameters"][T1_ARTERIAL_BLOOD], num_samples, rng
+            ),
+            0,
+            None,
+        )
+        # ASLDRO has limits on allowable values for `label_efficiency` between 0 and 1
+        model_parameters["label_efficiency"] = np.clip(
+            get_random_variable(
+                input_params["parameters"][LABEL_EFFICIENCY], num_samples, rng
+            ),
+            0,
+            1,
+        )
+        # limit `desired_snr` so cannot be less than 0
+        model_parameters["desired_snr"] = np.clip(
+            get_random_variable(
+                input_params["parameters"][DESIRED_SNR], num_samples, rng
+            ),
+            0,
+            None,
         )
 
     elif input_params["analysis_type"] == SENSITIVITY:
@@ -211,10 +260,17 @@ def main():
     # mean and SD for GM and WM, calculated and ground truth
     output_array = np.zeros((num_samples, 8))
 
-    results_df = pd.DataFrame(model_parameters, dtype=float)
+    inputs_df = pd.DataFrame(model_parameters, dtype=float)
 
     results = []
+
     for idx in range(num_samples):
+
+        logger.info(
+            "####################\n Iteration No. %s of %s\n",
+            pprint.pformat(idx),
+            pprint.pformat(num_samples),
+        )
 
         asldro_params["perfusion_rate"]["scale"] = model_parameters[
             "perfusion_rate_scale"
@@ -238,25 +294,25 @@ def main():
         output_array[idx, 6] = results[idx]["ground_truth"]["WM"]["mean"]
         output_array[idx, 7] = results[idx]["ground_truth"]["WM"]["sd"]
 
-    # combined arrays
-
-    # Create a pandas DataFrame to hold the results
-
-    output_df = pd.DataFrame(
-        output_array,
-        columns=[
-            "calc GM mean",
-            "calc GM sd",
-            "calc WM mean",
-            "calc WM sd",
-            "gt GM mean",
-            "gt GM sd",
-            "gt WM mean",
-            "gt WM sd",
-        ],
-    )
-    results_df = pd.concat([results_df, output_df], axis=1)
-    results_df.to_csv(output_filename, float_format="%.8f")
+        # Create a pandas DataFrame to hold the results
+        output_df = pd.DataFrame(
+            output_array,
+            columns=[
+                "calc GM mean",
+                "calc GM sd",
+                "calc WM mean",
+                "calc WM sd",
+                "gt GM mean",
+                "gt GM sd",
+                "gt WM mean",
+                "gt WM sd",
+            ],
+        )
+        # concatenate with the input parameters
+        results_df = pd.concat([inputs_df, output_df], axis=1)
+        # save each time in the loop in case there is an error so to avoid data loss
+        results_df.to_csv(output_filename, float_format="%.8f")
+        logger.info("--- Elapsed %.2f seconds ---", (time.time() - start_time))
 
     # if a sensitivity analysis is run, analyse these results
     if input_params["analysis_type"] == SENSITIVITY:
@@ -268,8 +324,7 @@ def main():
             sens_analysis_results[key].to_csv(
                 output_filename, float_format="%0.8f", mode="a"
             )
-
-    print("--- %.2f seconds ---" % (time.clock() - start_time))
+    logger.info("--- Total time %.2f seconds ---", (time.time() - start_time))
 
 
 def whitepaper_model(dro_params: dict, calc_params: dict) -> dict:
@@ -356,6 +411,8 @@ def whitepaper_model(dro_params: dict, calc_params: dict) -> dict:
     input_params["image_series"][0]["series_parameters"] = asl_series_params
     ground_truth_series_params = input_params["image_series"][1]["series_parameters"]
     ground_truth_series_params[ACQ_MATRIX] = asl_series_params[ACQ_MATRIX]
+
+    logger.info("Launch ASLDRO with parameters:\n%s", pprint.pformat(input_params))
 
     # run the DRO, load in the results, calculate the CBF, analyse.
     with TemporaryDirectory() as temp_dir:
@@ -492,6 +549,7 @@ def analyse_effects(results_df: pd.DataFrame) -> dict:
         for param in all_parameter_labels
         if not all(results_df[param].values == results_df[param].values[0])
     ]
+
     encoded_levels = results_df[sens_params]
     for param in sens_params:
         values: np.array = results_df[param].values
@@ -512,15 +570,12 @@ def analyse_effects(results_df: pd.DataFrame) -> dict:
         )
         for param in sens_params:
             effects = results_df.groupby(param)[result].mean()
-            levels = encoded_levels.groupby(param).mean()
-            interactions_matrix.at[param, param] = sum(
-                [
-                    level * effects.values[i]
-                    for i, level in enumerate(levels.index.values)
-                ]
+            levels = encoded_levels[param].unique()
+            interactions_matrix.loc[param, param] = sum(
+                [level * effects.values[i] for i, level in enumerate(levels)]
             )
             # calculate the standard error for comparing the effects against
-            interactions_matrix.at["std_err", param] = results_df[result].std(
+            interactions_matrix.loc["std_err", param] = results_df[result].std(
                 ddof=0
             ) / np.sqrt(2 ** len(results_df[result]))
         output[result] = {}
@@ -533,15 +588,15 @@ def analyse_effects(results_df: pd.DataFrame) -> dict:
             for key in twoway_labels:
                 keylist = list(key)
                 effects = results_df.groupby(keylist)[result].mean()
-                levels_i = encoded_levels.groupby(key[0]).mean()
-                levels_j = encoded_levels.groupby(key[1]).mean()
+                levels_i = encoded_levels[key[0]].unique()
+                levels_j = encoded_levels[key[1]].unique()
                 vals_i: np.ndarray = results_df[key[0]].unique()
                 vals_j: np.ndarray = results_df[key[1]].unique()
-                output[result].at[key[0], key[1]] = sum(
+                output[result].loc[key[0], key[1]] = sum(
                     [
-                        lev_i * lev_j * effects[vals_i[i]][vals_j[j]] / 2
-                        for i, lev_i in enumerate(levels_i.index.values)
-                        for j, lev_j in enumerate(levels_j.index.values)
+                        lev_i * lev_j * effects.loc[vals_i[i], vals_j[j]] / 2
+                        for i, lev_i in enumerate(levels_i)
+                        for j, lev_j in enumerate(levels_j)
                     ]
                 )
     return output

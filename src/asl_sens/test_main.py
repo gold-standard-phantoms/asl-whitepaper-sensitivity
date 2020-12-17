@@ -1,13 +1,19 @@
 """tests for main.py"""
 import pytest
-
+import os
+from tempfile import TemporaryDirectory
 import pandas as pd
 import numpy as np
 import numpy.testing
 from numpy.random import default_rng
 
 from asl_sens.data.filepaths import SENS_ANALYSIS_TEST_DATA
-from asl_sens.main import analyse_effects, get_random_variable, whitepaper_model
+from asl_sens.main import (
+    analyse_effects,
+    get_random_variable,
+    whitepaper_model,
+    run_analysis,
+)
 
 
 def test_whitepaper_model():
@@ -100,7 +106,7 @@ def test_analyse_effects():
     # t1_arterial_blood: 1.55 and 1.75
     results_df = pd.read_csv(SENS_ANALYSIS_TEST_DATA)
     results_df.pop("Unnamed: 0")
-    
+
     effects = analyse_effects(results_df)
     # main effect label_efficiency for GM
     gm_values = results_df["calc GM mean"].values
@@ -122,3 +128,48 @@ def test_analyse_effects():
         effects["calc GM mean"].at["label_efficiency", "t1_arterial_blood"],
         two_way_effect,
     )
+
+
+def test_run_analysis_uncertainty():
+    "tests that the main analysis with an uncertainty analysis with 1 sample"
+    input_params = {
+        "parameters": {
+            "label_efficiency": {"distribution": "gaussian", "mean": 0.85, "sd": 0.1},
+            "t1_arterial_blood": {"distribution": "gaussian", "mean": 1.65, "sd": 0.1},
+            "lambda_blood_brain": {"distribution": "uniform", "min": 0.8, "max": 1.0},
+            "perfusion_rate_scale": {
+                "distribution": "gaussian",
+                "mean": 1.0,
+                "sd": 0.0,
+            },
+            "t1_tissue_scale": {"distribution": "gaussian", "mean": 1.0, "sd": 0.1},
+            "transit_time_scale": {"distribution": "gaussian", "mean": 1.0, "sd": 0.1},
+            "desired_snr": {"distribution": "uniform", "min": 25, "max": 200},
+        },
+        "number_samples": 1,
+        "random_seed": 0,
+        "analysis_type": "uncertainty",
+    }
+
+    with TemporaryDirectory() as temp_dir:
+        output_filename = os.path.join(temp_dir, "output.csv")
+        run_analysis(input_params, output_filename)
+
+
+def test_run_analysis_sensitivity():
+    "tests that the main analysis with a sensitivity analysis with 1 parameter"
+    input_params = {
+        "parameters": {
+            "label_efficiency": {
+                "distribution": "linear",
+                "min": 0.8,
+                "max": 0.9,
+                "size": 2,
+            },
+        },
+        "analysis_type": "sensitivity",
+    }
+
+    with TemporaryDirectory() as temp_dir:
+        output_filename = os.path.join(temp_dir, "output.csv")
+        run_analysis(input_params, output_filename)
