@@ -1,0 +1,398 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Quickstart &mdash; ASLSENS  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API Reference" href="../api.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> ASLSENS
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sensitivity-analysis">Sensitivity analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#uncertainty-analysis">Uncertainty analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">ASLSENS</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Quickstart</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/usage/quickstart.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
+<p>First install the package. Follow <a class="reference internal" href="installation.html"><span class="doc">Installation</span></a> to set up a project and install ASLSENS first.</p>
+<p>After installation the command line tool <code class="docutils literal notranslate"><span class="pre">aslsens</span></code> wil be made available. You can run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aslsens</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">output_file</span><span class="o">.</span><span class="n">csv</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">config_file</span><span class="o">.</span><span class="n">json</span>
+</pre></div>
+</div>
+<p>to run either a sensitivity or uncertainty analysis of the Whitepaper equation.</p>
+<p>The config file is a JSON document detailing the type of analysis and the parameters that are to be
+varied and their distributions. The configuration files have differences depending on whether a
+sensitivity or uncertainty analysis is run.</p>
+<p>In both cases they share the following fields:</p>
+<dl class="field-list simple">
+<dt class="field-odd">analysis_type</dt>
+<dd class="field-odd"><p>(string) Defines which analysis is run, either <code class="docutils literal notranslate"><span class="pre">&quot;uncertainty&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;sensitivity&quot;</span></code>.</p>
+</dd>
+<dt class="field-even">parameters</dt>
+<dd class="field-even"><p>(object) an object which defines the parameters and their distributions. Any omitted
+will be set to their defaults (see each analysis type for the default values), if empty then all
+parameters will be set to their default for the <code class="docutils literal notranslate"><span class="pre">analysis_type</span></code>. Each parameter is an object
+which must have an entry “distribution”, and then corresponding entries dependent on what
+distribution is chosen.</p>
+</dd>
+</dl>
+<p>The following parameters are supported:</p>
+<dl class="field-list simple">
+<dt class="field-odd">label_efficiency</dt>
+<dd class="field-odd"><p>Number between 0 and 1 that defines the degree of labelling.</p>
+</dd>
+<dt class="field-even">t1_arterial_blood</dt>
+<dd class="field-even"><p>The longitudinal relaxation time in seconds.</p>
+</dd>
+<dt class="field-odd">lambda_blood_brain</dt>
+<dd class="field-odd"><p>The blood brain partition coefficient in ml/g.</p>
+</dd>
+<dt class="field-even">transit_time_scale</dt>
+<dd class="field-even"><p>Scaling factor that the ASLDRO ground truth <code class="docutils literal notranslate"><span class="pre">transit_time</span></code> is multiplied by.</p>
+</dd>
+<dt class="field-odd">t1_tissue_scale</dt>
+<dd class="field-odd"><p>Scaling factor that the ASLDRO ground truth <code class="docutils literal notranslate"><span class="pre">t1</span></code> is multiplied by.</p>
+</dd>
+<dt class="field-even">perfusion_rate_scale</dt>
+<dd class="field-even"><p>Scaling factor that the ASLDRO ground truth <code class="docutils literal notranslate"><span class="pre">perfusion_rate</span></code> is multiplied by.</p>
+</dd>
+<dt class="field-odd">desired_snr</dt>
+<dd class="field-odd"><p>The base image SNR. A value of 0 means no noise is added.</p>
+</dd>
+</dl>
+<p>The following distributions are supported:</p>
+<dl class="field-list simple">
+<dt class="field-odd">gaussian</dt>
+<dd class="field-odd"><p>Values are randomly drawn from a normal distribution. Two additional parameters are
+required: “mean” and “sd”, the mean and standard deviation of the distribution, respectively.
+By setting the standard deviation to 0.0 then the same value is selected each time.</p>
+</dd>
+<dt class="field-even">uniform</dt>
+<dd class="field-even"><p>Values are randomly drawn uniformly over a defined range. Two additional
+parameters are required: “min” and “max”, the minimum and maximum values of the range.</p>
+</dd>
+<dt class="field-odd">linear</dt>
+<dd class="field-odd"><p>Values are linearly spaced over a range. Requires two additional parameters: <code class="docutils literal notranslate"><span class="pre">&quot;min&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&quot;max&quot;</span></code>, the minimum and maximum values of the range.</p>
+</dd>
+</dl>
+<div class="section" id="sensitivity-analysis">
+<h2>Sensitivity analysis<a class="headerlink" href="#sensitivity-analysis" title="Permalink to this headline">¶</a></h2>
+<p>When running a sensitivity analysis, each parameter that is to be varied in the analysis must have
+<code class="docutils literal notranslate"><span class="pre">distribution</span></code> <code class="docutils literal notranslate"><span class="pre">&quot;linear&quot;</span></code>, with an additional parameter <code class="docutils literal notranslate"><span class="pre">&quot;size&quot;</span></code>, which is an integer that
+specifies the number of values. The model will be run for all combinations of the parameters that
+have a linear distribution, which is the product of all the <code class="docutils literal notranslate"><span class="pre">&quot;size&quot;</span></code> entries.</p>
+<p>The default sensitivity analysis configuration is a two-level analysis
+of the parameter <code class="docutils literal notranslate"><span class="pre">lambda_blood_brain</span></code> only, with low value <code class="docutils literal notranslate"><span class="pre">0.8</span></code> and high value <code class="docutils literal notranslate"><span class="pre">1.0</span></code>. The
+corresponding configuration file for this is:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;analysis_type&quot;</span><span class="p">:</span> <span class="s2">&quot;sensitivity&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;label_efficiency&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;min&quot;</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span>
+            <span class="nt">&quot;max&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;t1_arterial_blood&quot;</span><span class="p">:</span> <span class="p">{</span>
+           <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;mean&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="nt">&quot;sd&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;lambda_blood_brain&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;min&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+            <span class="nt">&quot;max&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="nt">&quot;size&quot;</span><span class="p">:</span> <span class="mi">2</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;perfusion_rate_scale&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;mean&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="nt">&quot;sd&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;t1_tissue_scale&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;mean&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="nt">&quot;sd&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;transit_time_scale&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;mean&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="nt">&quot;sd&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;desired_snr&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;mean&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="nt">&quot;sd&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="uncertainty-analysis">
+<h2>Uncertainty analysis<a class="headerlink" href="#uncertainty-analysis" title="Permalink to this headline">¶</a></h2>
+<p>The uncertainty analysis runs the model a specified number of times, sampling each parameter from
+their defined distribution.  It requires two additional root-level parameters:</p>
+<dl class="field-list simple">
+<dt class="field-odd">number_samples</dt>
+<dd class="field-odd"><p>the total number of times to run the model. On a i5-8400 CPU it takes approximately
+30 seconds to run the model once.</p>
+</dd>
+<dt class="field-even">random_seed</dt>
+<dd class="field-even"><p>seed for the random number generator (uses default_rng from numpy.random)</p>
+</dd>
+</dl>
+<p>Both of these parameters do not have default values and must be supplied if <code class="docutils literal notranslate"><span class="pre">analysis_type</span></code> is
+<code class="docutils literal notranslate"><span class="pre">&quot;uncertainty&quot;</span></code>.</p>
+<p>The parameter settings are given below.  This configuration file will run the model once using the
+mean values of each of the parameters (as the default is to have standard deviation of 0):</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="nt">&quot;analysis_type&quot;</span><span class="p">:</span> <span class="s2">&quot;uncertainty&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;random_seed&quot;</span><span class="p">:</span> <span class="mi">12345</span><span class="p">,</span>
+    <span class="nt">&quot;number_samples&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="nt">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;label_efficiency&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;mean&quot;</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">,</span>
+            <span class="nt">&quot;sd&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;t1_arterial_blood&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;mean&quot;</span><span class="p">:</span> <span class="mf">1.65</span><span class="p">,</span>
+            <span class="nt">&quot;sd&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;lambda_blood_brain&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;mean&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+            <span class="nt">&quot;sd&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;desired_snr&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;mean&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="nt">&quot;sd&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;perfusion_rate_scale&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;mean&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="nt">&quot;sd&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;t1_tissue_scale&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;mean&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="nt">&quot;sd&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;transit_time_scale&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;mean&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="nt">&quot;sd&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../api.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Gold Standard Phantoms
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
