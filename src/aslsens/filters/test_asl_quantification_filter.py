@@ -10,7 +10,7 @@ import nibabel as nib
 from asldro.filters.basefilter import BaseFilter, FilterInputValidationError
 from asldro.containers.image import NiftiImageContainer
 
-from asl_sens.filters.asl_quantification_filter import AslQuantificationFilter
+from aslsens.filters.asl_quantification_filter import AslQuantificationFilter
 
 TEST_VOLUME_DIMENSIONS = (32, 32, 32)
 TEST_NIFTI_ONES = nib.Nifti2Image(

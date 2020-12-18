@@ -13,10 +13,10 @@ import nibabel as nib
 from asldro.containers.image import BaseImageContainer, NiftiImageContainer
 from asldro.filters.bids_output_filter import BidsOutputFilter
 
-from asl_sens.filters.test_asl_quantification_filter import (
+from aslsens.filters.test_asl_quantification_filter import (
     validate_filter_inputs,
 )
-from asl_sens.filters.load_asl_bids_filter import LoadAslBidsFilter
+from aslsens.filters.load_asl_bids_filter import LoadAslBidsFilter
 
 
 TEST_VOLUME_DIMENSIONS = (32, 32, 32)

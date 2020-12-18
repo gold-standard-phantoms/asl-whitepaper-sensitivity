@@ -4,19 +4,19 @@
             "distribution": "linear",
             "min": 0.8,
             "max": 0.9,
-            "size": 3
+            "size": 2
         },
         "t1_arterial_blood": {
             "distribution": "linear",
             "min": 1.55,
             "max": 1.75,
-            "size": 3
+            "size": 2
         },
         "lambda_blood_brain": {
             "distribution": "linear",
             "min": 0.8,
             "max": 1.0,
-            "size": 3
+            "size": 2
         },
         "perfusion_rate_scale": {
             "distribution": "gaussian",
@@ -27,13 +27,13 @@
             "distribution": "linear",
             "min": 0.9,
             "max": 1.1,
-            "size": 3
+            "size": 2
         },
         "transit_time_scale": {
             "distribution": "linear",
             "min": 0.9,
             "max": 1.1,
-            "size": 3
+            "size": 2
         },
         "desired_snr": {
             "distribution": "gaussian",

@@ -146,7 +146,7 @@ INPUT_SCHEMA = {
     ],
 }
 
-USER_INPUT_VALIDATOR = ParameterValidator(
+USER_INPUT_VALIDATOR_UNCERTAINTY = ParameterValidator(
     parameters={
         LAMBDA_BLOOD_BRAIN: Parameter(
             validators=[],
@@ -186,7 +186,52 @@ USER_INPUT_VALIDATOR = ParameterValidator(
         DESIRED_SNR: Parameter(
             validators=[],
             optional=True,
-            default_value={"distribution": "gaussian", "mean": 100.0, "sd": 0.0},
+            default_value={"distribution": "gaussian", "mean": 0.0, "sd": 0.0},
+        ),
+    }
+)
+
+USER_INPUT_VALIDATOR_SENSITIVITY = ParameterValidator(
+    parameters={
+        LAMBDA_BLOOD_BRAIN: Parameter(
+            validators=[],
+            optional=True,
+            default_value={"distribution": "linear", "min": 0.8, "max": 1.0, "size": 2},
+        ),
+        T1_ARTERIAL_BLOOD: Parameter(
+            validators=[],
+            optional=True,
+            default_value={"distribution": "gaussian", "mean": 1.65, "sd": 0.0},
+        ),
+        LABEL_EFFICIENCY: Parameter(
+            validators=[],
+            optional=True,
+            default_value={"distribution": "gaussian", "mean": 0.85, "sd": 0.0},
+        ),
+        PERFUSION_RATE_SCALE: Parameter(
+            validators=[],
+            optional=True,
+            default_value={"distribution": "gaussian", "mean": 1.0, "sd": 0.0},
+        ),
+        T1_TISSUE_SCALE: Parameter(
+            validators=[],
+            optional=True,
+            default_value={"distribution": "gaussian", "mean": 1.0, "sd": 0.0},
+        ),
+        TRANSIT_TIME_SCALE: Parameter(
+            validators=[],
+            optional=True,
+            default_value={"distribution": "gaussian", "mean": 1.0, "sd": 0.0},
+        ),
+        TRANSIT_TIME_SCALE: Parameter(
+            validators=[],
+            optional=True,
+            default_value={"distribution": "gaussian", "mean": 1.0, "sd": 0.0},
+        ),
+        DESIRED_SNR: Parameter(
+            validators=[],
+            optional=True,
+            default_value={"distribution": "gaussian", "mean": 0.0, "sd": 0.0},
         ),
     }
 )
@@ -201,8 +246,12 @@ def validate_input_parameters(input_params: dict) -> dict:
         raise ValidationError from ex
 
     # validate the parameters object
-    input_params["parameters"] = USER_INPUT_VALIDATOR.validate(
-        input_params["parameters"]
-    )
-
+    if input_params["analysis_type"] == UNCERTAINTY:
+        input_params["parameters"] = USER_INPUT_VALIDATOR_UNCERTAINTY.validate(
+            input_params["parameters"]
+        )
+    elif input_params["analysis_type"] == SENSITIVITY:
+        input_params["parameters"] = USER_INPUT_VALIDATOR_SENSITIVITY.validate(
+            input_params["parameters"]
+        )
     return input_params

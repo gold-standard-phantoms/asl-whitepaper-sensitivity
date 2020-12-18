@@ -2,13 +2,14 @@
 import pytest
 import os
 from tempfile import TemporaryDirectory
+from unittest.mock import Mock, patch
 import pandas as pd
 import numpy as np
 import numpy.testing
 from numpy.random import default_rng
 
-from asl_sens.data.filepaths import SENS_ANALYSIS_TEST_DATA
-from asl_sens.main import (
+from aslsens.data.filepaths import SENS_ANALYSIS_TEST_DATA
+from aslsens.main import (
     analyse_effects,
     get_random_variable,
     whitepaper_model,
@@ -131,7 +132,40 @@ def test_analyse_effects():
 
 
 def test_run_analysis_uncertainty():
-    "tests that the main analysis with an uncertainty analysis with 1 sample"
+    """Mocks a call to whitepaper_model to test that the main analysis
+    with an uncertainty analysis with 1 sample"""
+    whitepaper_model_mock = Mock(wraps=whitepaper_model)
+    test_results = {
+        "calculated": {
+            "GM": {
+                "id": 1,
+                "mean": 60,
+                "sd": 5,
+                "size": 10,
+            },
+            "WM": {
+                "id": 1,
+                "mean": 20,
+                "sd": 2,
+                "size": 10,
+            },
+        },
+        "ground_truth": {
+            "GM": {
+                "id": 1,
+                "mean": 60,
+                "sd": 5,
+                "size": 10,
+            },
+            "WM": {
+                "id": 1,
+                "mean": 20,
+                "sd": 2,
+                "size": 10,
+            },
+        },
+    }
+
     input_params = {
         "parameters": {
             "label_efficiency": {"distribution": "gaussian", "mean": 0.85, "sd": 0.1},
@@ -150,14 +184,47 @@ def test_run_analysis_uncertainty():
         "random_seed": 0,
         "analysis_type": "uncertainty",
     }
-
-    with TemporaryDirectory() as temp_dir:
-        output_filename = os.path.join(temp_dir, "output.csv")
-        run_analysis(input_params, output_filename)
+    with patch("aslsens.main.whitepaper_model", new=whitepaper_model_mock):
+        whitepaper_model_mock.return_value = test_results
+        with TemporaryDirectory() as temp_dir:
+            output_filename = os.path.join(temp_dir, "output.csv")
+            run_analysis(input_params, output_filename)
 
 
 def test_run_analysis_sensitivity():
-    "tests that the main analysis with a sensitivity analysis with 1 parameter"
+    """Mocks a call to whitepaper_model to test that the main analysis
+    with a sensitivity analysis with 1 parameter"""
+    whitepaper_model_mock = Mock(wraps=whitepaper_model)
+    test_results = {
+        "calculated": {
+            "GM": {
+                "id": 1,
+                "mean": 60,
+                "sd": 5,
+                "size": 10,
+            },
+            "WM": {
+                "id": 1,
+                "mean": 20,
+                "sd": 2,
+                "size": 10,
+            },
+        },
+        "ground_truth": {
+            "GM": {
+                "id": 1,
+                "mean": 60,
+                "sd": 5,
+                "size": 10,
+            },
+            "WM": {
+                "id": 1,
+                "mean": 20,
+                "sd": 2,
+                "size": 10,
+            },
+        },
+    }
     input_params = {
         "parameters": {
             "label_efficiency": {
@@ -169,7 +236,9 @@ def test_run_analysis_sensitivity():
         },
         "analysis_type": "sensitivity",
     }
+    with patch("aslsens.main.whitepaper_model", new=whitepaper_model_mock):
+        whitepaper_model_mock.return_value = test_results
 
-    with TemporaryDirectory() as temp_dir:
-        output_filename = os.path.join(temp_dir, "output.csv")
-        run_analysis(input_params, output_filename)
+        with TemporaryDirectory() as temp_dir:
+            output_filename = os.path.join(temp_dir, "output.csv")
+            run_analysis(input_params, output_filename)

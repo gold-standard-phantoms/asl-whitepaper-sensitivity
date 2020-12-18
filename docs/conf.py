@@ -20,7 +20,7 @@ sys.path.append(os.path.join(os.path.dirname(__name__), "../src"))
 
 # -- Project information -----------------------------------------------------
 
-project = "ASL Whitepaper Equation Analysis"
+project = "ASLSENS"
 copyright = "2020, Gold Standard Phantoms"
 author = "Aaron Oliver-Taylor"
 
@@ -36,7 +36,7 @@ extensions = ["sphinx.ext.autodoc", "sphinx.ext.mathjax"]
 # This is useful when some external dependencies are not met at build time
 # and break the building process. You may only specify the root package of
 # the dependencies themselves and omit the sub-modules:
-autodoc_mock_imports = ["numpy", "nibabel", "asldro"]
+autodoc_mock_imports = ["numpy", "nibabel", "pandas", "jsonschema"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

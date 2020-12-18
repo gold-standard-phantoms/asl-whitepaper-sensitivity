@@ -7,14 +7,14 @@ import numpy as np
 import nibabel as nib
 import numpy.testing
 
-from asl_sens.filters.test_asl_quantification_filter import TEST_NIFTI_CON_ONES
 
 from asldro.filters.basefilter import BaseFilter, FilterInputValidationError
 from asldro.containers.image import NiftiImageContainer
 
-from asl_sens.filters.roi_statistics_filter import RoiStatisticsFilter
+from aslsens.filters.roi_statistics_filter import RoiStatisticsFilter
+from aslsens.filters.test_asl_quantification_filter import TEST_NIFTI_CON_ONES
 
-from asl_sens.filters.test_asl_quantification_filter import (
+from aslsens.filters.test_asl_quantification_filter import (
     validate_filter_inputs,
 )
 

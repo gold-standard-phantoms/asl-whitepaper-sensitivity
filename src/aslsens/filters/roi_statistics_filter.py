@@ -1,5 +1,5 @@
 """ ROI Statistics Filter """
-from logging import Filter
+
 import numpy as np
 from asldro.filters.basefilter import BaseFilter, FilterInputValidationError
 from asldro.containers.image import BaseImageContainer
@@ -42,36 +42,37 @@ class RoiStatisticsFilter(BaseFilter):
     **Outputs**
 
     :param 'region_stats': dictionary with an object for each region name as defined in
-    ``'LabelMap'``, this then having fields:
+        ``'LabelMap'``, this then having fields:
+
         * 'id': the integer value assigned to the region.
         * 'mean': the mean value within the region.
         * 'sd': the standard deviation within the region.
         * 'size': the number of voxels in the region.
 
-    For example:
+        For example:
 
-    .. code-block:: python
+        .. code-block:: python
 
-        {
-            "region_1": {
-                "id": 1,
-                "mean": 84.2,
-                "sd": 13.4,
-                "size": 2456,
-            },
-            "region_2": {
-                "id": 2,
-                "mean": 84.2,
-                "sd": 13.4,
-                "size": 2401,
-            },
-            "region_3": {
-                "id": 3,
-                "mean": 74.3,
-                "sd": 3.6,
-                "size": 6734
-            },
-        }
+            {
+                "region_1": {
+                    "id": 1,
+                    "mean": 84.2,
+                    "sd": 13.4,
+                    "size": 2456,
+                },
+                "region_2": {
+                    "id": 2,
+                    "mean": 84.2,
+                    "sd": 13.4,
+                    "size": 2401,
+                },
+                "region_3": {
+                    "id": 3,
+                    "mean": 74.3,
+                    "sd": 3.6,
+                    "size": 6734
+                },
+            }
 
     """
 

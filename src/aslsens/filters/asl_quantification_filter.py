@@ -25,11 +25,11 @@ class AslQuantificationFilter(BaseFilter):
     member function. They are also accessible via class constants, for example
     :class:`AslQuantificationFilter.KEY_CONTROL`
 
-    :param: 'control': the control image (3D or 4D timeseries)
+    :param 'control': the control image (3D or 4D timeseries)
     :type 'control': BaseImageContainer
-    :param: 'label': the label image (3D or 4D timeseries)
+    :param 'label': the label image (3D or 4D timeseries)
     :type 'label': BaseImageContainer
-    :param: 'm0': equilibrium magnetisation image
+    :param 'm0': equilibrium magnetisation image
     :type 'm0': BaseImageContainer
     :param 'label_type': the type of labelling used: "pasl" for pulsed ASL  "pcasl" or "casl" for
         for continuous ASL.
@@ -54,21 +54,25 @@ class AslQuantificationFilter(BaseFilter):
 
     **Outputs**
 
-    :param 'perfusion_rate':
+    :param 'perfusion_rate': map of the calculated perfusion rate
     :type 'perfusion_rate': BaseImageContainer
 
+
     The following equations are used to calculate the perfusion rate, depending on the
-    input ``model``
+    input ``model``:
 
-    If ``model`` is equal to 'whitepaper'
+    * If ``model`` is equal to 'whitepaper' then the equations used are those featured in the paper
+      Alsop et al. Recommended implementation of arterial spin-labeled perfusion MRI for clinical
+      applications: A consensus of the ISMRM perfusion study group and the European consortium for
+      ASL in dementia. Magnetic Resonance in Medicine 2014;73:102–116 doi: 10.1002/mrm.25197.
 
-    For ``label_type`` 'pcasl' or 'casl'
+        * For ``label_type`` 'pcasl' or 'casl'
 
-    .. math::
-        f = \frac{6000 \cdot\ (\text{SI}_{\text{control}} - \text{SI}_{\text{label}}) \cdot
-        e^{\frac{\text{PLD}}{T_{1,b}}}}{2 \cdot \alpha \cdot T_{1,b} \cdot \text{SI}_{\text{M0}}
-        \cdot (1-e^{-\frac{\tau}{T_{1,b}}})}
-        \text{where:}
+        .. math::
+            f = \frac{6000 \cdot\ (\text{SI}_{\text{control}} - \text{SI}_{\text{label}}) \cdot
+            e^{\frac{\text{PLD}}{T_{1,b}}}}{2 \cdot \alpha \cdot T_{1,b} \cdot \text{SI}_{\text{M0}}
+            \cdot (1-e^{-\frac{\tau}{T_{1,b}}})}
+            \text{where:}
 
 
     """

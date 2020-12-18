@@ -56,7 +56,7 @@ def get_version(rel_path) -> str:
 
 setup(
     name="aslsens",
-    version=get_version("src/asl_sens/__init__.py"),
+    version=get_version("src/aslsens/__init__.py"),
     author="Gold Standard Phantoms",
     author_email="aaron.oliver-taylor@goldstandardphantoms.com",
     description="Sensitivity analysis of the ASL White Paper Equation",
@@ -77,5 +77,5 @@ setup(
     python_requires=">=3.7",
     install_requires=requirements,
     include_package_data=True,
-    entry_points={"console_scripts": ["aslsens=asl_sens.main:main"]},
+    entry_points={"console_scripts": ["aslsens=aslsens.main:main"]},
 )

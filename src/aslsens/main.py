@@ -37,10 +37,10 @@ from asldro.validators.user_parameter_input import (
 )
 from asldro.cli import FileType
 
-from asl_sens.filters.load_asl_bids_filter import LoadAslBidsFilter
-from asl_sens.filters.asl_quantification_filter import AslQuantificationFilter
-from asl_sens.filters.roi_statistics_filter import RoiStatisticsFilter
-from asl_sens.validators.user_parameter_input import (
+from aslsens.filters.load_asl_bids_filter import LoadAslBidsFilter
+from aslsens.filters.asl_quantification_filter import AslQuantificationFilter
+from aslsens.filters.roi_statistics_filter import RoiStatisticsFilter
+from aslsens.validators.user_parameter_input import (
     PERFUSION_RATE_SCALE,
     SENSITIVITY,
     T1_TISSUE_SCALE,
