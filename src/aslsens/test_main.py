@@ -7,8 +7,8 @@ import numpy as np
 import numpy.testing
 from numpy.random import default_rng
 
-from asl_sens.data.filepaths import SENS_ANALYSIS_TEST_DATA
-from asl_sens.main import (
+from aslsens.data.filepaths import SENS_ANALYSIS_TEST_DATA
+from aslsens.main import (
     analyse_effects,
     get_random_variable,
     whitepaper_model,

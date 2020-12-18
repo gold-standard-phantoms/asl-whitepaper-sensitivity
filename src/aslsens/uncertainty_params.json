@@ -1,7 +1,7 @@
 {
     "analysis_type": "uncertainty",
-    "random_seed": 0,
-    "number_samples": 2,
+    "random_seed": 12345,
+    "number_samples": 12000,
     "parameters": {
         "label_efficiency": {
             "distribution": "gaussian",

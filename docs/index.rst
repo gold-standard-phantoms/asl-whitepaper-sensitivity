@@ -8,6 +8,8 @@ Welcome to ASL Whitepaper Sensitivity Analysis's documentation!
    :caption: Contents:
    
    usage/overview
+   usage/installation
+   usage/quickstart
    api
 
 

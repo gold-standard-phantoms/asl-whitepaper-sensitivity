@@ -1,5 +1,5 @@
 """ ROI Statistics Filter """
-from logging import Filter
+
 import numpy as np
 from asldro.filters.basefilter import BaseFilter, FilterInputValidationError
 from asldro.containers.image import BaseImageContainer

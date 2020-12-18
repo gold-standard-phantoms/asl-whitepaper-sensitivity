@@ -2,7 +2,7 @@ from copy import deepcopy
 from jsonschema.validators import validate
 import pytest
 from asldro.validators.parameters import ValidationError
-from asl_sens.validators.user_parameter_input import validate_input_parameters
+from aslsens.validators.user_parameter_input import validate_input_parameters
 
 TEST_INPUT_UNCERTAINTY = {
     "parameters": {
@@ -147,8 +147,8 @@ def test_user_parameter_input_invalid_input():
         validate_input_parameters(d)
 
 
-def test_user_parameter_input_defaults():
-    """Tests that the default parameters are correctly created"""
+def test_user_parameter_input_defaults_uncertainty():
+    """Tests that the default uncertainty parameters are correctly created"""
 
     params = validate_input_parameters(
         {
@@ -171,11 +171,46 @@ def test_user_parameter_input_defaults():
             },
             "t1_tissue_scale": {"distribution": "gaussian", "mean": 1.0, "sd": 0.0},
             "transit_time_scale": {"distribution": "gaussian", "mean": 1.0, "sd": 0.0},
-            "desired_snr": {"distribution": "gaussian", "mean": 100.0, "sd": 0.0},
+            "desired_snr": {"distribution": "gaussian", "mean": 0.0, "sd": 0.0},
         },
         "number_samples": 10,
         "random_seed": 0,
         "analysis_type": "uncertainty",
+    }
+
+    assert params == default_params
+
+
+def test_user_parameter_input_defaults_sensitivity():
+    """Tests that the default sensitivity parameters are correctly created"""
+
+    params = validate_input_parameters(
+        {
+            "parameters": {},
+            "analysis_type": "sensitivity",
+        }
+    )
+
+    default_params = {
+        "parameters": {
+            "lambda_blood_brain": {
+                "distribution": "linear",
+                "min": 0.8,
+                "max": 1.0,
+                "size": 2,
+            },
+            "t1_arterial_blood": {"distribution": "gaussian", "mean": 1.65, "sd": 0.0},
+            "label_efficiency": {"distribution": "gaussian", "mean": 0.85, "sd": 0.0},
+            "perfusion_rate_scale": {
+                "distribution": "gaussian",
+                "mean": 1.0,
+                "sd": 0.0,
+            },
+            "t1_tissue_scale": {"distribution": "gaussian", "mean": 1.0, "sd": 0.0},
+            "transit_time_scale": {"distribution": "gaussian", "mean": 1.0, "sd": 0.0},
+            "desired_snr": {"distribution": "gaussian", "mean": 0.0, "sd": 0.0},
+        },
+        "analysis_type": "sensitivity",
     }
 
     assert params == default_params
