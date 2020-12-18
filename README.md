@@ -23,7 +23,7 @@ In both cases they share the following fields:
 
 * **analysis_type**
 
-    (string) Defines which analysis is run, either “uncertainty” or “sensitivity”.
+    (string) Defines which analysis is run, either `"uncertainty"` or `"sensitivity"`.
 
 
 
@@ -59,19 +59,19 @@ The following parameters are supported:
 
 * **transit_time_scale**
 
-    Scaling factor that the ground truth “transit_time” is multiplied by.
+    Scaling factor that the ASLDRO ground truth `transit_time` is multiplied by.
 
 
 
 * **t1_tissue_scale**
 
-    Scaling factor that the ground truth “t1” is multiplied by.
+    Scaling factor that the ASLDRO ground truth `t1` is multiplied by.
 
 
 
 * **perfusion_rate_scale**
 
-    Scaling factor that the ground truth “perfusion_rate” is multiplied by.
+    Scaling factor that the ASLDRO ground truth `perfusion_rate` is multiplied by.
 
 
 
@@ -100,7 +100,7 @@ The following distributions are supported:
 
 * **linear**
 
-    Values are linearly spaced over a range. Requires two additional parameter: `"min"` and
+    Values are linearly spaced over a range. Requires two additional parameters: `"min"` and
     `"max"`, the minimum and maximum values of the range.
 
 

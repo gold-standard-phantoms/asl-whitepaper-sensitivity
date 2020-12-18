@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Autoformatting and linting rules set up
 - ASL Quantification Filter
 - Load ASL Bids Filter
+- ROI statistics filter
 - User parameter input
 - Monte carlo uncertainty analysis
 - Full factorial sensitivity analysis
