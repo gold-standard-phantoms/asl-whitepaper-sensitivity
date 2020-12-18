@@ -16,7 +16,7 @@ sensitivity or uncertainty analysis is run.
 In both cases they share the following fields:
 
 
-:analysis_type: (string) Defines which analysis is run, either "uncertainty" or "sensitivity".
+:analysis_type: (string) Defines which analysis is run, either ``"uncertainty"`` or ``"sensitivity"``.
 :parameters: (object) an object which defines the parameters and their distributions. Any omitted
   will be set to their defaults (see each analysis type for the default values), if empty then all
   parameters will be set to their default for the ``analysis_type``. Each parameter is an object
@@ -29,9 +29,9 @@ The following parameters are supported:
 :label_efficiency: Number between 0 and 1 that defines the degree of labelling.
 :t1_arterial_blood: The longitudinal relaxation time in seconds.
 :lambda_blood_brain: The blood brain partition coefficient in ml/g.
-:transit_time_scale: Scaling factor that the ground truth "transit_time" is multiplied by.
-:t1_tissue_scale: Scaling factor that the ground truth "t1" is multiplied by.
-:perfusion_rate_scale: Scaling factor that the ground truth "perfusion_rate" is multiplied by.
+:transit_time_scale: Scaling factor that the ASLDRO ground truth ``transit_time`` is multiplied by.
+:t1_tissue_scale: Scaling factor that the ASLDRO ground truth ``t1`` is multiplied by.
+:perfusion_rate_scale: Scaling factor that the ASLDRO ground truth ``perfusion_rate`` is multiplied by.
 :desired_snr: The base image SNR. A value of 0 means no noise is added.
 
 The following distributions are supported:
@@ -41,7 +41,7 @@ The following distributions are supported:
    By setting the standard deviation to 0.0 then the same value is selected each time.
 :uniform: Values are randomly drawn uniformly over a defined range. Two additional
   parameters are required: "min" and "max", the minimum and maximum values of the range.
-:linear: Values are linearly spaced over a range. Requires two additional parameter: ``"min"`` and
+:linear: Values are linearly spaced over a range. Requires two additional parameters: ``"min"`` and
   ``"max"``, the minimum and maximum values of the range. 
 
 
